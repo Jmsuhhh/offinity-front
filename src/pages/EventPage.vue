@@ -49,8 +49,10 @@
 import Calendar from '@toast-ui/calendar';
 import '@toast-ui/calendar/dist/toastui-calendar.min.css';
 import { onMounted, ref } from 'vue'
+import 'tui-date-picker/dist/tui-date-picker.css';
+import 'tui-time-picker/dist/tui-time-picker.css';
 
-const calendarRef = ref(null)
+const calendarContainer = ref(null)
 const calendarInstance = ref(null)
 
 const title = ref('')
@@ -66,8 +68,11 @@ const showDetailPopup = ref(false)
 const selectedEvent = ref({})
 
 onMounted(() => {
-    calendarInstance.value = new Calendar(calendarRef.value, {
+    calendarInstance.value = new Calendar(calendarContainer.value, {
         defaultView: 'month',
+        showFormPopup: true,
+        useFormPopup: false,
+        useDetailPopup: false,
         calendars: [
             { id: 'all', name: '전체', backgroundColor: '#9e5fff' },
             { id: 'dept1', name: '부서1', backgroundColor: '#00a9ff' },
@@ -75,16 +80,24 @@ onMounted(() => {
             { id: 'dept3', name: '부서3', backgroundColor: '#ff4040' },
         ],
     });
+    
 
-    calendarInstance.value.on('clickDayName', () => {
-        showFormPopup.value = true;
-    });
-
-    calendarInstance.value.on('clickSchedule', (e) => {
-        selectedEvent.value = e.schedule;
-        showDetailPopup.value = true;
-    });
+    calendarInstance.value.on('click', (e) => {
+        if (e.schedule == null) {
+      console.log('폼 팝업 열기');
+      showFormPopup.value = true;
+    } else {
+      console.log('디테일 팝업 열기', e.schedule);
+      selectedEvent.value = e.schedule;
+      showDetailPopup.value = true;
+    }
+  });
 });
+//     calendarInstance.value.on('click', (e) => {
+//         selectedEvent.value = e.schedule;
+//         showDetailPopup.value = true;
+//     });
+// });
 
 
 function submitEvent() {
@@ -125,13 +138,12 @@ function resetForm() {
 <style scoped>
 .form-box,
 .detail-box {
-    background-color: #f5f5f5;
-    border: 1px solid #ccc;
-    padding: 20px;
-    width: 400px;
-    position: absolute;
-    top: 100px;
-    left: 100px;
-    z-index: 999;
+  position: fixed;
+  top: 100px;
+  left: 100px;
+  background: white;
+  z-index: 9999;
+  border: 1px solid #ccc;
+  padding: 20px;
 }
 </style>
