@@ -50,7 +50,7 @@ import Calendar from '@toast-ui/calendar';
 import '@toast-ui/calendar/dist/toastui-calendar.min.css';
 import { onMounted, ref } from 'vue'
 
-const calendarRef = ref(null)
+const calendarContainer = ref(null)
 const calendarInstance = ref(null)
 
 const title = ref('')
@@ -66,8 +66,10 @@ const showDetailPopup = ref(false)
 const selectedEvent = ref({})
 
 onMounted(() => {
-    calendarInstance.value = new Calendar(calendarRef.value, {
+    calendarInstance.value = new Calendar(calendarContainer.value, {
         defaultView: 'month',
+        useFormPopup : true, 
+        useDetailPopup : true,
         calendars: [
             { id: 'all', name: '전체', backgroundColor: '#9e5fff' },
             { id: 'dept1', name: '부서1', backgroundColor: '#00a9ff' },
@@ -76,14 +78,14 @@ onMounted(() => {
         ],
     });
 
-    calendarInstance.value.on('clickDayName', () => {
-        showFormPopup.value = true;
-    });
+    // calendarInstance.value.on('clickDayName', () => {
+    //     showFormPopup.value = true;
+    // });
 
-    calendarInstance.value.on('clickSchedule', (e) => {
-        selectedEvent.value = e.schedule;
-        showDetailPopup.value = true;
-    });
+    // calendarInstance.value.on('clickSchedule', (e) => {
+    //     selectedEvent.value = e.schedule;
+    //     showDetailPopup.value = true;
+    // });
 });
 
 
