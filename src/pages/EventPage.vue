@@ -12,11 +12,11 @@
                 <div class="day-cell"  v-for="day in days" :key="day.date" :class="[
                     { holiday: isHoliday(day.date) },
                     { outside: !day.isCurrentMonth }
-                ]">
+                ]" @click="onDateClick(day)">
                     <div class="date-number" :class="[
                         { sunday: day.isSunday },
                         { outsideText: !day.isCurrentMonth }
-                    ]" @click="onDateClick(day)">
+                    ]" >
                         {{ day.date.getDate() }}
                     </div>
 
@@ -39,7 +39,7 @@
                 <p v-if="selectedEvent.location"><strong>장소:</strong> {{ selectedEvent.location }}</p>
                 <p v-if="selectedEvent.attendees"><strong>참석자:</strong> {{ selectedEvent.attendees }}</p>
                 <p v-if="selectedEvent.description"><strong>내용:</strong> {{ selectedEvent.description }}</p>
-                <button @click="showDetailPopup = false">닫기</button>
+                <button @click="onEventClose">닫기</button>
             </div>
         </div>
         <div v-if="showFormPopup" class="popup-overlay">
@@ -177,17 +177,15 @@ function getHoliday(date) {
 
 function onDateClick(dayObj) {
     const baseDate = format(dayObj.date, 'yyyy-MM-dd')
-    const found = events.value.find(e => e.date === baseDate)
-    if (found) {
-        selectedEvent.value = found
-        showDetailPopup.value = true
-    } else {
-        formStartDate.value = baseDate
-        formEndDate.value = baseDate
-        formStartTime.value = '09:00'
-        formEndTime.value = '18:00'
-        showFormPopup.value = true
-    }
+    // const found = events.value.find(e => e.date === baseDate)
+   
+    formStartDate.value = baseDate
+    formEndDate.value = baseDate
+    formStartTime.value = '09:00'
+    formEndTime.value = '18:00'
+    showFormPopup.value = true
+    
+    document.body.style.overflow = 'hidden';
 }
 
 function submitEvent() {
@@ -228,6 +226,7 @@ function resetForm() {
     isAllDay.value = false
     showFormPopup.value = false
     showDetailPopup.value = false
+    document.body.style.overflow = 'auto';
 }
 function dayEvents(date) {
     const dateStr = format(date, 'yyyy-MM-dd')
@@ -236,6 +235,12 @@ function dayEvents(date) {
 function onEventClick(event) {
     selectedEvent.value = event
     showDetailPopup.value = true
+    document.body.style.overflow = 'hidden';
+}
+
+function onEventClose(){
+    showDetailPopup.value = false;
+    document.body.style.overflow = 'auto';
 }
 
 function openBlankForm() {
@@ -255,27 +260,23 @@ function openBlankForm() {
 
 <style>
 .calendar-page {
-    width: 100vw;
-    height: 100vh;
+    /* 달력 가로길이 조절 */
+    max-width: 1000px;
+    /* 가운데 정렬 조절 */
+    margin: 0 auto;
     box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+
     padding: 0;
     background-color: white;
 }
 
 .calendar-container {
-    width: 100%;
-    max-width: 2000px;
-    min-height: 600px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
     border-radius: 2px;
     padding: 2px;
     background-color: white;
     display: flex;
     flex-direction: column;
-    align-items: center;
     margin: 0;
     position: relative;
 }
@@ -291,8 +292,17 @@ function openBlankForm() {
 
 .calendar-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-rows: auto;
+    grid-auto-rows: minmax(150px , auto);
     gap: 4px;
+    margin-bottom: 80px;
+}
+
+.floating-add-button{
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
 }
 
 
@@ -306,8 +316,6 @@ function openBlankForm() {
 }
 
 .day-cell {
-    min-width: 190px;
-    min-height: 150px;
     border: 1px solid #ddd;
     padding: 9px;
     position: relative;
