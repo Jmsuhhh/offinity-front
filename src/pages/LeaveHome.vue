@@ -291,7 +291,7 @@
 
             // 입력 폼 초기화
             leaveApply.value = {
-                approverId: '', leaveType: '', requestDate: '',
+                approverId: '', leaveType: '', requestDate: dayjs().format('YYYY-MM-DD'),
                 startDate: '', endDate: '', leaveDays: 0, reason: ''
             };
 
@@ -388,7 +388,7 @@
             alert("연차 수정이 완료되었습니다.");
             isEditMode.value = false;
             leaveApply.value = {
-                approverId: '', leaveType: '', requestDate: '',
+                approverId: '', leaveType: '', requestDate: dayjs().format('YYYY-MM-DD'),
                 startDate: '', endDate: '', leaveDays: 0, reason: ''
             };
             loadLeaveRequests(employeeId);
