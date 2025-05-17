@@ -1,7 +1,15 @@
 /* 공통 CSS 입력 */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=Noto+Sans+KR:wght@100..900&display=swap');
+          /* google에서 Fonts로 조회한 후 적당한 font를 골라서 embded code 중 Web의 @import 선택 */
 
 * {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
+  padding: 0;                               /* 안쪽 여백  */
+  margin: 0;                                /* 바깥쪽 여백  */
+  box-sizing: border-box;                   /* 요소의 너비와 높이는 테두리와 패딩을 포함한 전체크기로 설정  */
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+body{                                       /* body에 적용하는 Rule-setting  */
+  background-color: black;                /* 바탕색은 black */
+  color: white;                           /* 글자색은 흰색으로  */
 }
