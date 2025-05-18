@@ -24,13 +24,27 @@
                 <input @input="onUserPasswordChkInput" :value="userPasswordChk" id="user-password-chk" type="password" placeholder="비밀번호를 한 번 더 입력해 주세요." />
                 <p class="err-msg" id="password-chk-err-msg">{{ userPasswordChkErrMsg }}</p>
             </div>
+
+            <div class="input-box"> <!-- 본인 확인 질문 -->
+                <label for="security-question">본인 확인 질문</label>
+                <select v-model="userSecurityQuestion" id="security-question"> 
+                    <option value="" hidden selected>-- 선택하세요 --</option>
+                    <option value="1">내가 태어난 곳은?</option>
+                    <option value="2">내가 다닌 초등학교 이름은?</option>
+                    <option value="3">내가 가장 좋아하는 영화는?</option>
+                </select>
+                <input @input="onUserSecurityAnswerInput" :value="userSecurityAnswer" id="security-answer" type="text" placeholder="응답 입력">
+                <p class="err-msg" id="security-answer-err-msg">{{ userSecurityAnswerErrMsg }}</p>
+            </div>
         </div>
         <button>회원가입</button>
+        <AuthFooter location="회원가입" />
     </form>
 
 </template>
 
 <script setup>
+import AuthFooter from '@/components/AuthFooter.vue';
 import axios from 'axios';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -45,6 +59,9 @@ const userPassword = ref("");
 const userPasswordErrMsg = ref("");
 const userPasswordChk = ref("");
 const userPasswordChkErrMsg = ref("");
+const userSecurityQuestion = ref("");
+const userSecurityAnswer = ref("");
+const userSecurityAnswerErrMsg = ref("");
 
 // 양방향 바인딩을 하기 위한 함수
 function onUserNameInput(e) {
@@ -65,6 +82,11 @@ function onUserPasswordInput(e) {
 function onUserPasswordChkInput(e) {
     userPasswordChk.value = e.target.value;
     validateUserPasswordConfirmation();
+}
+
+function onUserSecurityAnswerInput(e) {
+    userSecurityAnswer.value = e.target.value;
+    validateUserSecurityAnswer();
 }
 
 // 이름 유효성 검사
@@ -128,13 +150,25 @@ function validateUserPasswordConfirmation() {
     return true;
 }
 
+// 본인 확인 응답 유효성 검사
+function validateUserSecurityAnswer() {
+    if (userSecurityAnswer.value == '') {
+        userSecurityAnswerErrMsg.value = "필수 입력 값입니다.";
+        return false;
+    }
+
+    userSecurityAnswerErrMsg.value = "";
+    return true;
+}
+
 function submitEvent() {
     const isUserNameValidate = validateUserName();
     const isUserEmailValidate = validateUserEmail();
     const isUserPasswordValidate = validateUserPassword();
     const isUserPasswordConfirmed = validateUserPasswordConfirmation();
+    const isUserSecurityAnswerValidate = validateUserSecurityAnswer();
 
-    if (isUserNameValidate && isUserEmailValidate && isUserPasswordValidate && isUserPasswordConfirmed) {
+    if (isUserNameValidate && isUserEmailValidate && isUserPasswordValidate && isUserPasswordConfirmed && isUserSecurityAnswerValidate) {
         createUser();
     }
 }
@@ -145,7 +179,9 @@ async function createUser() {
         let res = await axios.post("http://localhost:8001/api/signup", {
             userName: userName.value, 
             userEmail: userEmail.value, 
-            userPassword: userPassword.value
+            userPassword: userPassword.value,
+            userSecurityQuestion: userSecurityQuestion.value,
+            userSecurityAnswer: userSecurityAnswer.value
         });
         
         if (res.data == "성공") {
@@ -202,6 +238,10 @@ async function createUser() {
     outline-style: solid;
     outline-color: gray;
 
+}
+
+select option:disabled {
+  color: gray;
 }
 
 button {

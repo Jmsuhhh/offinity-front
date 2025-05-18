@@ -10,11 +10,13 @@
         </div>
         <p id="login-msg" style="margin-top: -10px;" class="err status-msg">{{ loginErrMsg }}</p>
         <button>로그인</button>
+        <AuthFooter location="로그인" />
     </form>
 
 </template>
 
 <script setup>
+import AuthFooter from '@/components/AuthFooter.vue';
 import axios from 'axios';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -115,6 +117,12 @@ button {
 /* 바로 앞에 input-box 클래스가 있는 경우에만 적용 */
 .input-box + .input-box {
     border-top: 1px solid gray;
+}
+
+.etc-container {
+    display: flex;
+
+    font-size: 12px;
 }
 
 </style>
