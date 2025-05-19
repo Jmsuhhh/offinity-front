@@ -87,8 +87,9 @@ async function loadApprovals() {
   try {
     const res = await axios.get(
       `http://localhost:8001/api/leave/${approverId}/approvals`, 
-      { withCredentials: true }
-    );
+      { headers : { Authorization : localStorage.getItem("token") },
+      withCredentials: true });
+
     approvalItems.value = res.data;
   } catch (e) {
     alert("결재 요청 불러오기 실패");
@@ -106,8 +107,9 @@ async function confirmDecision(approvalItems, decision) {
     };
 
     await axios.put(`http://localhost:8001/api/leave/${leaveConfirm.value.requestId}/approval`, 
-      leaveConfirm.value, { withCredentials: true }
-    );
+      leaveConfirm.value, 
+      { headers : { Authorization : localStorage.getItem("token") },
+      withCredentials: true });
 
     alert(`${decision === 'APPROVED' ? '승인' : '반려'} 완료되었습니다.`);
     router.push(`/leave/${approverId}`);

@@ -212,7 +212,8 @@
         try{
             const res = await axios.get(
                 `http://localhost:8001/api/leave/${employeeId}/employee`,
-                { withCredentials: true });
+                { headers : { Authorization : localStorage.getItem("token") },
+                  withCredentials: true });
             employeeInfo.value = res.data;
             console.log(employeeId);
             console.log(res.data);
@@ -226,8 +227,9 @@
         try {
             const res = await axios.get(
                 `http://localhost:8001/api/leave/${employeeId}/request`,
-                { withCredentials: true }
-            );
+                { headers : { Authorization : localStorage.getItem("token") },
+                  withCredentials: true });
+
             item.value = res.data;
             console.log("연차신청 목록:", res.data);
         } catch (e) {
@@ -242,8 +244,9 @@
         try {
             const res = await axios.get(
                 `http://localhost:8001/api/leave/${employeeId}/summary`,
-                { withCredentials: true }
-            );
+                { headers : { Authorization : localStorage.getItem("token") },
+                  withCredentials: true });
+
             leaveSummary.value = res.data;
             console.log("연차현황 요약:", res.data);
         } catch (e) {
@@ -258,8 +261,9 @@
         try {
             const res = await axios.get(
                 `http://localhost:8001/api/leave/${employeeId}/approver`,
-                { withCredentials: true }
-            );
+                { headers : { Authorization : localStorage.getItem("token") },
+                  withCredentials: true });
+
             leaveApprover.value = res.data;
             console.log("결재자 정보:", res.data);
         } catch (e) {
@@ -281,8 +285,9 @@
         try {
             await axios.post(
                `http://localhost:8001/api/leave/${employeeId}/apply`,
-                leaveApply.value, { withCredentials: true }
-            );
+                leaveApply.value, 
+                { headers : { Authorization : localStorage.getItem("token") },
+                  withCredentials: true });
 
             alert("연차 신청이 완료되었습니다.");
             // 신청 후 목록, 요약 다시 불러오기
@@ -382,8 +387,9 @@
         try {
             await axios.put(
                 `http://localhost:8001/api/leave/${leaveApply.value.requestId}`,
-                    leaveApply.value, { withCredentials: true }
-            );
+                leaveApply.value, 
+                { headers : { Authorization : localStorage.getItem("token") },
+                withCredentials: true });
 
             alert("연차 수정이 완료되었습니다.");
             isEditMode.value = false;
@@ -407,7 +413,9 @@
 
         try {
             await axios.delete(`http://localhost:8001/api/leave/${item.requestId}`, 
-                { withCredentials: true });
+                { headers : { Authorization : localStorage.getItem("token") },
+                  withCredentials: true });
+
             alert("연차 신청이 취소되었습니다.");
             loadLeaveRequests(route.params.id);
             loadLeaveSummary(route.params.id);
@@ -429,9 +437,10 @@
     //  결재할 연차신청 현황 숫자 계산
     async function loadPendingCount(employeeId) {
         try {
-            const res = await axios.get(`http://localhost:8001/api/leave/${employeeId}/approvals`, {
-                withCredentials: true
-            });
+            const res = await axios.get(`http://localhost:8001/api/leave/${employeeId}/approvals`, 
+                { headers : { Authorization : localStorage.getItem("token") },
+                withCredentials: true });
+                
             // 상태가 PENDING인 요청만 세기
             pendingCount.value = res.data.length;
         } catch (e) {
