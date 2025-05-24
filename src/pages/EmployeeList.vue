@@ -1,19 +1,14 @@
 <template>
     <div class="flex min-h-screen font-sans">
-      <!-- Sidebar -->
-      <aside class="w-60 bg-purple-100 text-purple-800 p-6">
-        <h1 class="text-xl font-bold mb-8">Admin Portal</h1>
-        <nav>
-          <ul>
-            <li class="mb-4"><a href="#" class="hover:underline">전체 직원 관리</a></li>
-            <li><a href="#" class="hover:underline">신규 직원 등록</a></li>
-          </ul>
-        </nav>
-      </aside>
   
       <!-- Main Content -->
       <main class="flex-1 bg-gray-50 p-10">
         <h2 class="text-xl font-semibold text-purple-800 mb-6 underline">전체 직원 명부</h2>
+        <nav>
+          <ul>
+            <li><a href="#" class="hover:underline">신규 직원 등록</a></li>
+          </ul>
+        </nav>
   
         <!-- Filters -->
         <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
@@ -98,7 +93,7 @@
   const sortField = ref('employee_id');
   const sortAsc = ref(true);
   const currentPage = ref(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 20;
   
   const employees = ref([
     { employee_id: 1001, name: '홍길동', department: '인사팀', position: '대리', email: 'hong@co.com', phone_number: '010-1234-5678', created_at: '2025-04-01' },
@@ -106,6 +101,10 @@
     { employee_id: 1003, name: '박지성', department: '기획팀', position: '사원', email: 'park@co.com', phone_number: '010-4567-1234', created_at: '2025-04-03' },
     { employee_id: 1004, name: '이수민', department: '개발팀', position: '과장', email: 'lee@co.com', phone_number: '010-5678-9012', created_at: '2025-04-04' },
     { employee_id: 1005, name: '정은지', department: '인사팀', position: '차장', email: 'jung@co.com', phone_number: '010-6789-1234', created_at: '2025-04-05' },
+    { employee_id: 1005, name: '정은지', department: '인사팀', position: '차장', email: 'jung@co.com', phone_number: '010-6789-1234', created_at: '2025-04-05' },
+    { employee_id: 1005, name: '정은지', department: '인사팀', position: '차장', email: 'jung@co.com', phone_number: '010-6789-1234', created_at: '2025-04-05' },
+    { employee_id: 1005, name: '정은지', department: '인사팀', position: '차장', email: 'jung@co.com', phone_number: '010-6789-1234', created_at: '2025-04-05' },
+
    
   ]);
   
@@ -149,5 +148,8 @@
   body {
     font-family: 'Noto Sans KR', sans-serif;
   }
+  
+  
+  
   </style>
   

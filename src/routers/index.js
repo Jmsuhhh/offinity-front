@@ -6,6 +6,7 @@ import LeaveApprovalPage from "@/pages/LeaveApprovalPage.vue";
 import LogInPage from "@/pages/LogInPage.vue";
 import SignUpPage from "@/pages/SignUpPage.vue";
 import FindEmailPage from "@/pages/FindEmailPage.vue";
+import EmployeeList from "@/pages/EmployeeList.vue";
 
 const routes = [ 
     { path: '/', component: MainPage },
@@ -14,7 +15,8 @@ const routes = [
     { path: '/leave/:id/approval', component: LeaveApprovalPage },
     { path: '/login', component: LogInPage },
     { path: '/signup', component: SignUpPage },
-    {path: '/find-email', component : FindEmailPage}
+    {path: '/find-email', component : FindEmailPage},
+    { path: '/emp-list', component : EmployeeList}
 ];
 
 const router = createRouter({
