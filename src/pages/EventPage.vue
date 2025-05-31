@@ -28,7 +28,9 @@
                     </div>
                     <div class="event-label" :class="`type-${event.type}`" v-for="event in dayEvents(day.date)"
                         :key="event.id" @click.stop="onEventClick(event)" :title="`${event.time} ${event.title}`">
-                        {{ event.isAllDay ? '종일' : event.startTime }} {{ event.title }}
+                        <span class="event-label-span">
+                            {{ event.isAllDay ? '종일' : event.startTime }} {{ event.title }}
+                        </span>
 
                     </div>
                     <div class="holiday-label" :class="{ faded: !day.isCurrentMonth }" v-if="getHoliday(day.date)">
@@ -643,16 +645,25 @@ function openBlankForm() {
 }
 
 .all-day-checkbox {
-    display: inline-flex;
+    
+    display: flex;
     align-items: center;
     gap: 4px;
     margin: 12px 0 4px;
     font-size: 16px;
+    justify-content: center;
 }
-
+.all-day-checkbox input{
+    margin-bottom: 0;
+    width: auto;
+}
 .all-day-checkbox label {
     white-space: nowrap;
     font-weight: normal;
     margin: 0;
+}
+.event-label-span{
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 </style>
