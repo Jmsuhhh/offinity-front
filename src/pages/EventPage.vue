@@ -2,9 +2,16 @@
     <div class="calendar-page">
         <div class="calendar-container">
             <div class="calendar-header">
-                <button class="nav-btn" @click="prevMonth">&lt;</button>
-                <h2>{{ format(currentMonth, 'yyyy.MM') }}</h2>
-                <button class="nav-btn" @click="nextMonth">&gt;</button>
+                <div class="header-left">Offinity</div>
+                <div class="header-center">
+                    <button class="nav-btn" @click="prevMonth">&lt;</button>
+                    <h2>{{ format(currentMonth, 'yyyy.MM') }}</h2>
+                    <button class="nav-btn" @click="nextMonth">&gt;</button>
+                </div>
+                <div class="header-right">
+                    <button class="top-add-button" @click="openBlankForm">일정 추가</button>
+                    <span class="login-btn" @click="goToLogin">로그인</span>
+                </div>
             </div>
 
             <div class="calendar-grid">
@@ -19,28 +26,37 @@
                     ]">
                         {{ day.date.getDate() }}
                     </div>
+                    <div class="event-label" :class="`type-${event.type}`" v-for="event in dayEvents(day.date)"
+                        :key="event.id" @click.stop="onEventClick(event)" :title="`${event.time} ${event.title}`">
+                        {{ event.isAllDay ? '종일' : event.startTime }} {{ event.title }}
+
+                    </div>
                     <div class="holiday-label" :class="{ faded: !day.isCurrentMonth }" v-if="getHoliday(day.date)">
                         {{ getHoliday(day.date) }}
                     </div>
-                    <!-- <div class="event-label" v-for="event in dayEvents(day.date)" :key="event.id">
-                        {{ event.isAllDay ? '종일' : event.time.split('~')[0]?.trim() }} {{ event.title }}
-                    </div> -->
-                </div>
-
-                <div v-for="event in visibleEvents" :key="event.id" class="event-label"
-                    :style="getAbsoluteEventStyle(event)" @click.stop="onEventClick(event)">
-                    {{ event.isAllDay ? '종일' : event.time.split('~')[0]?.trim() }} {{ event.title }}
                 </div>
             </div>
-
-            <button class="floating-add-button" @click="openBlankForm">일정 추가</button>
         </div>
         <div v-if="showDetailPopup" class="popup-overlay" @click.self="onEventClose">
             <div class="popup-box">
                 <h3>[일정 상세보기]</h3>
                 <p><strong>제목:</strong> {{ selectedEvent.title }}</p>
-                <!-- <p><strong>일정:</strong> {{ selectedEvent.date }} {{ selectedEvent.time }}</p> -->
-                <p><strong>일정:</strong> {{ format(selectedEvent.date, 'yyyy-MM-dd') }} {{ selectedEvent.time }}</p>
+                <p>
+                    <strong>일정: </strong>
+                    <template v-if="selectedEvent.isAllDay">
+                        {{ format(selectedEvent.date, 'yyyy-MM-dd') }}
+                        <template
+                            v-if="format(selectedEvent.endDate, 'yyyy-MM-dd') !== format(selectedEvent.date, 'yyyy-MM-dd')">
+                            ~ {{ format(selectedEvent.endDate, 'yyyy-MM-dd') }}
+                        </template>
+                    </template>
+                    <template v-else>
+                        {{ format(selectedEvent.date, 'yyyy-MM-dd') }} {{ selectedEvent.startTime }}
+                        ~
+                        {{ format(selectedEvent.endDate, 'yyyy-MM-dd') }} {{ selectedEvent.endTime }}
+                    </template>
+                </p>
+
                 <p v-if="selectedEvent.location"><strong>장소:</strong> {{ selectedEvent.location }}</p>
                 <p v-if="selectedEvent.attendees"><strong>참석자:</strong> {{ selectedEvent.attendees }}</p>
                 <p v-if="selectedEvent.description"><strong>내용:</strong> {{ selectedEvent.description }}</p>
@@ -74,6 +90,12 @@
                     <label for="allDay">종일</label>
                 </div>
 
+                <label>일정 유형</label>
+                <select v-model="formType">
+                    <option value="내부">내부</option>
+                    <option value="외부">외부</option>
+                    <option value="연차">연차</option>
+                </select>
 
                 <label>장소</label>
                 <input v-model="formLocation" placeholder="장소" />
@@ -129,6 +151,8 @@ const isAllDay = ref(false)
 const formLocation = ref('')
 const formAttendees = ref('')
 const formDescription = ref('')
+const formType = ref('내부')
+
 
 const days = computed(() => {
     const start = startOfWeek(startOfMonth(currentMonth.value))
@@ -174,6 +198,11 @@ watch([formStartDate, formStartTime], ([newDate, newTime]) => {
     }
 })
 
+function goToLogin() {
+    window.location.href = '/login'
+}
+
+
 function prevMonth() {
     currentMonth.value = subMonths(currentMonth.value, 1)
 }
@@ -203,17 +232,27 @@ function fetchCalendarSummary() {
         })
         holidays.value = result
 
-        const loadedEvents = res.data.events.map(e => ({
-            id: e.eventId,
-            title: e.title,
-            date: parseISO(e.startDate),
-            endDate: parseISO(e.endDate),
-            time: e.isAllDay ? '종일' : `${e.startTime?.slice(0, 5)} ~ ${e.endTime?.slice(0, 5)}`,
-            location: e.location,
-            attendees: e.attendees || '',
-            description: e.description
-        }))
-        events.value = loadedEvents
+        const loadedEvents = res.data.events.map(e => {
+            const isAllDay = !!e.isAllDay; // 문자열 '1' 같은 것도 boolean 처리
+            const start = parseISO(e.startDate);
+            const end = parseISO(e.endDate || e.startDate);
+
+            return {
+                id: e.eventId,
+                title: e.title,
+                date: start,
+                endDate: end,
+                isAllDay,
+                startTime: isAllDay ? null : e.startTime?.slice(0, 5),
+                endTime: isAllDay ? null : e.endTime?.slice(0, 5),
+                location: e.location,
+                attendees: e.attendees || '',
+                description: e.description,
+                type: e.type || '내부'
+            };
+        });
+        events.value = loadedEvents;
+
 
         nextTick(() => {
             updateVisibleEvents()
@@ -222,19 +261,16 @@ function fetchCalendarSummary() {
         console.error('캘린더 데이터 불러오기 실패:', err)
     })
 }
-// function dayEvents(date) {
-//     const dateStr = format(date, 'yyyy-MM-dd')
-//     return events.value.filter(event => format(event.date, 'yyyy-MM-dd') === dateStr)
-// }
 
-// function dayEvents(date) {
-//     const dateStr = format(date, 'yyyy-MM-dd');
-//     return events.value.filter(event => {
-//         const start = format(event.date, 'yyyy-MM-dd');
-//         const end = format(event.endDate || event.date, 'yyyy-MM-dd');
-//         return dateStr >= start && dateStr <= end;
-//     });
-// }
+function dayEvents(date) {
+    const dateStr = format(date, 'yyyy-MM-dd');
+    return events.value.filter(event => {
+        const start = format(event.date, 'yyyy-MM-dd');
+        const end = format(event.endDate || event.date, 'yyyy-MM-dd');
+        return dateStr >= start && dateStr <= end;
+    });
+}
+
 
 function onDateClick(dayObj) {
     if (!isLoggedIn.value || userRole.value !== 'ADMIN') return
@@ -271,6 +307,7 @@ function resetForm() {
     isAllDay.value = false
     showFormPopup.value = false
     showDetailPopup.value = false
+    formType.value = '내부'
     document.body.style.overflow = 'auto';
 }
 
@@ -297,6 +334,7 @@ function submitEvent() {
         startTime: isAllDay.value ? null : formStartTime.value,
         endTime: isAllDay.value ? null : formEndTime.value,
         isAllDay: isAllDay.value,
+        type: formType.value,
         location: formLocation.value,
         createdBy: 1 // 테스트용
     }).then(() => {
@@ -306,34 +344,6 @@ function submitEvent() {
     }).catch(err => {
         console.error('등록 실패:', err)
     })
-}
-
-function getAbsoluteEventStyle(event) {
-    const grid = document.querySelector('.calendar-grid');
-    const gridWidth = grid?.offsetWidth || 700;
-    const cellWidth = gridWidth / 7;
-
-    const start = new Date(event.date);
-    const end = new Date(event.endDate || event.date);
-
-    const startIndex = days.value.findIndex(d => format(d.date, 'yyyy-MM-dd') === format(start, 'yyyy-MM-dd'));
-    const endIndex = days.value.findIndex(d => format(d.date, 'yyyy-MM-dd') === format(end, 'yyyy-MM-dd'));
-
-    if (startIndex === -1 || endIndex === -1) return {};
-
-    return {
-        position: 'absolute',
-        top: `${32 + (startIndex / 7 | 0) * 150}px`,
-        left: `${startIndex * cellWidth}px`,
-        width: `${(endIndex - startIndex + 1) * cellWidth}px`,
-        height: '20px',
-        backgroundColor: 'lightpink',
-        padding: '2px 6px',
-        borderRadius: '4px',
-        fontSize: '14px',
-        color: 'black',
-        zIndex: 5
-    };
 }
 
 function onDeleteEvent() {
@@ -369,6 +379,18 @@ function openBlankForm() {
 </script>
 
 <style scoped>
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+}
+
+.login-icon {
+    cursor: pointer;
+    font-size: 16px;
+    color: #555;
+}
+
 .calendar-page {
     /* 달력 가로길이 조절 */
     max-width: 1000px;
@@ -391,14 +413,65 @@ function openBlankForm() {
     position: relative;
 }
 
-.calendar-header {
+/* .calendar-header {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 12px;
     margin-bottom: 16px;
     font-size: 25px;
+    color: black;
+} */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+  color: black;
 }
+
+.header-left {
+  font-size: 22px;
+  font-weight: bold;
+  color: black;
+}
+
+.header-center {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.login-btn {
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.top-add-button {
+    /* position: absolute; */
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 6px 12px;
+    background-color: rgb(244, 236, 255);
+    color: rgb(36, 0, 36);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    height: 36px;
+}
+
 
 .calendar-grid {
     display: grid;
@@ -410,26 +483,20 @@ function openBlankForm() {
     position: relative;
 }
 
-.floating-add-button {
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
-}
-
-
-
 .day-header {
     font-size: 20px;
     text-align: center;
     font-weight: bold;
     padding: 4px 0;
     background: #f0f0f0;
+    color: black;
 }
 
 .day-cell {
     border: 1px solid #ddd;
     padding: 9px;
     position: relative;
+    overflow: hidden;
 }
 
 .date-number {
@@ -460,30 +527,42 @@ function openBlankForm() {
     margin-top: 4px;
 }
 
-/* .event-label {
-    font-size: 15px;
-    background-color: lightpink;
-    margin-top: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: black;
-    display: block;
-    grid-column-end: span 1;
-} */
-
 .event-label {
-    position: absolute;
-    top: 32px;
+    margin-top: 4px;
     background: lightpink;
     color: black;
-    padding: 2px 8px;
+    padding: 2px 6px;
     border-radius: 4px;
     font-size: 13px;
+    line-height: 20px;
+    height: 20px;
+    max-width: 100%;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    z-index: 10;
+
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+
+    flex: 1 1 auto;
+}
+
+.type-내부 {
+    background-color: rgb(221, 241, 247);
+}
+
+.type-외부 {
+    background-color: rgb(255, 251, 213);
+}
+
+.type-연차 {
+    background-color: rgb(255, 231, 231);
 }
 
 .holiday-label.faded {
@@ -516,13 +595,6 @@ function openBlankForm() {
     justify-content: center;
     align-items: center;
 }
-
-/* .popup-box {
-    background: white;
-    padding: 24px;
-    border-radius: 8px;
-    width: 400px;
-} */
 
 .popup-box {
     background: white;
@@ -564,31 +636,23 @@ function openBlankForm() {
     box-sizing: border-box;
 }
 
+.popup-box label {
+    display: block;
+    margin-top: 12px;
+    text-align: left;
+}
+
 .all-day-checkbox {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    margin: 8px 0;
+    gap: 4px;
+    margin: 12px 0 4px;
+    font-size: 16px;
 }
 
 .all-day-checkbox label {
-    margin: 0;
+    white-space: nowrap;
     font-weight: normal;
-}
-
-
-.floating-add-btn {
-    position: absolute;
-    right: 20px;
-    bottom: 20px;
-    width: 60px;
-    height: 60px;
-    font-size: 14px;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
-    background-color: coral;
-    color: white;
-    z-index: 999;
+    margin: 0;
 }
 </style>
