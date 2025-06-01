@@ -7,6 +7,10 @@ import LogInPage from "@/pages/LogInPage.vue";
 import SignUpPage from "@/pages/SignUpPage.vue";
 import FindEmailPage from "@/pages/FindEmailPage.vue";
 import EmployeeList from "@/pages/EmployeeList.vue";
+import SuggestionBoardPage from "@/pages/SuggestionBoardPage.vue";
+import SuggestionCreatePage from "@/pages/SuggestionCreatePage.vue";
+import SuggestionUpdatePage from "@/pages/SuggestionUpdatePage.vue";
+import SuggestionDetailPage from "@/pages/SuggestionDetailPage.vue";
 
 const routes = [ 
     { path: '/', component: MainPage },
@@ -16,7 +20,11 @@ const routes = [
     { path: '/login', component: LogInPage },
     { path: '/signup', component: SignUpPage },
     {path: '/find-email', component : FindEmailPage},
-    { path: '/emp-list', component : EmployeeList}
+    { path: '/emp-list', component : EmployeeList},
+    { path: '/board/suggestion', component : SuggestionBoardPage},
+    { path: '/board/suggestion/:id', component : SuggestionDetailPage},
+    { path: '/board/suggestion/:id/update', component : SuggestionUpdatePage},
+    { path: '/board/create-suggestion', component : SuggestionCreatePage}
 ];
 
 const router = createRouter({
