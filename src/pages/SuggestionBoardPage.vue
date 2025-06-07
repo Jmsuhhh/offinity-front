@@ -13,7 +13,7 @@
     <tbody>
       <tr v-for="board in boardList" :key="board.postId">
         <td>{{board.postId}}</td>
-        <td class="title">{{board.title}}</td>
+        <td class="title" @click="clickTitle(board.postId)">{{board.title}}</td>
         <td>{{board.userId}}</td>
         <td>{{dateFormat(board.createdAt)}}</td>
         <td>{{board.views}}</td>
@@ -26,8 +26,15 @@
 <script setup>
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const boardList = ref([]);
+
+const router = useRouter()
+
+function clickTitle(id){
+  router.push(`/board/suggestion/${id}`)
+}
 
 function dateFormat(date){
   const target = new Date(date);

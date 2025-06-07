@@ -11,6 +11,8 @@ import SuggestionBoardPage from "@/pages/SuggestionBoardPage.vue";
 import SuggestionCreatePage from "@/pages/SuggestionCreatePage.vue";
 import SuggestionUpdatePage from "@/pages/SuggestionUpdatePage.vue";
 import SuggestionDetailPage from "@/pages/SuggestionDetailPage.vue";
+import NoticeBoardPage from "@/pages/NoticeBoardPage.vue";
+import NoticeDetailPage from "@/pages/NoticeDetailPage.vue";
 
 const routes = [ 
     { path: '/', component: MainPage },
@@ -19,12 +21,14 @@ const routes = [
     { path: '/leave/:id/approval', component: LeaveApprovalPage },
     { path: '/login', component: LogInPage },
     { path: '/signup', component: SignUpPage },
-    {path: '/find-email', component : FindEmailPage},
+    { path: '/find-email', component : FindEmailPage},
     { path: '/emp-list', component : EmployeeList},
     { path: '/board/suggestion', component : SuggestionBoardPage},
     { path: '/board/suggestion/:id', component : SuggestionDetailPage},
     { path: '/board/suggestion/:id/update', component : SuggestionUpdatePage},
-    { path: '/board/create-suggestion', component : SuggestionCreatePage}
+    { path: '/board/create-suggestion', component : SuggestionCreatePage},
+    { path: '/board/notice', component: NoticeBoardPage },
+    { path: '/board/notice/:id', component: NoticeDetailPage }
 ];
 
 const router = createRouter({
