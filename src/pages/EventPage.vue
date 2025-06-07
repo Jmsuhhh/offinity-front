@@ -229,7 +229,7 @@ function fetchCalendarSummary() {
     const year = currentMonth.value.getFullYear()
     const month = currentMonth.value.getMonth() + 1
     const token = localStorage.getItem('token')
-    const headers = token ? { Authorization: `Bearer ${token}` } : {}
+    const headers = token ? { Authorization: `${token}` } : {}
 
 
     axios.get(`http://localhost:8001/api/calendar/summary`, {
