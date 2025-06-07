@@ -9,8 +9,9 @@
                     <button class="nav-btn" @click="nextMonth">&gt;</button>
                 </div>
                 <div class="header-right">
-                    <button class="top-add-button" @click="openBlankForm">일정 추가</button>
-                    <span class="login-btn" @click="goToLogin">로그인</span>
+                    <button v-if="isLoggedIn" class="top-add-button" @click="openBlankForm">일정 추가</button>
+                    <span class="login-btn" v-if="!isLoggedIn" @click="goToLogin">로그인</span>
+                    <span class="login-btn" v-else @click="logout">로그아웃</span>
                 </div>
             </div>
 
@@ -83,7 +84,7 @@
 
                 <label>종료</label>
                 <div class="datetime-group">
-                    <input type="date" v-model="formEndDate" />
+                    <input type="date" v-model="formEndDate" :min="formStartDate" />
                     <input type="time" v-model="formEndTime" v-if="!isAllDay" />
                 </div>
 
@@ -131,9 +132,7 @@ import {
 } from 'date-fns'
 import axios from 'axios'
 
-const isLoggedIn = ref(true)
-const userRole = ref('ADMIN')
-
+const isLoggedIn = ref(false)
 const currentMonth = ref(new Date())
 const weekDays = ['일', '월', '화', '수', '목', '금', '토']
 
@@ -182,15 +181,16 @@ function updateVisibleEvents() {
 }
 
 onMounted(() => {
-    // fetchEvents()
-    // fetchHolidays()
+    const token = localStorage.getItem('token')
+    console.log('📌 현재 토큰:', token)
+    isLoggedIn.value = !!token
     fetchCalendarSummary()
 })
 
 watch(currentMonth, () => {
     // fetchHolidays()
     fetchCalendarSummary()
-    updateVisibleEvents()
+    // updateVisibleEvents()
 })
 
 watch([formStartDate, formStartTime], ([newDate, newTime]) => {
@@ -201,9 +201,15 @@ watch([formStartDate, formStartTime], ([newDate, newTime]) => {
 })
 
 function goToLogin() {
-    window.location.href = '/login'
+    const current = encodeURIComponent(window.location.pathname)
+    window.location.href = `/login?redirect=${current}`
 }
 
+function logout() {
+    localStorage.removeItem('token')
+    isLoggedIn.value = false
+    window.location.reload()
+}
 
 function prevMonth() {
     currentMonth.value = subMonths(currentMonth.value, 1)
@@ -222,9 +228,13 @@ function getHoliday(date) {
 function fetchCalendarSummary() {
     const year = currentMonth.value.getFullYear()
     const month = currentMonth.value.getMonth() + 1
+    const token = localStorage.getItem('token')
+    const headers = token ? { Authorization: `Bearer ${token}` } : {}
+
 
     axios.get(`http://localhost:8001/api/calendar/summary`, {
-        params: { year, month }
+        params: { year, month },
+        headers
     }).then(res => {
         const result = {}
 
@@ -234,26 +244,23 @@ function fetchCalendarSummary() {
         })
         holidays.value = result
 
-        const loadedEvents = res.data.events.map(e => {
-            const isAllDay = !!e.isAllDay; // 문자열 '1' 같은 것도 boolean 처리
-            const start = parseISO(e.startDate);
-            const end = parseISO(e.endDate || e.startDate);
-
-            return {
-                id: e.eventId,
-                title: e.title,
-                date: start,
-                endDate: end,
-                isAllDay,
-                startTime: isAllDay ? null : e.startTime?.slice(0, 5),
-                endTime: isAllDay ? null : e.endTime?.slice(0, 5),
-                location: e.location,
-                attendees: e.attendees || '',
-                description: e.description,
-                type: e.type || '내부'
-            };
-        });
-        events.value = loadedEvents;
+        events.value = res.data.events
+            ? res.data.events
+                .filter(e => !!e.startDate)
+                .map(e => ({
+                    id: e.eventId,
+                    title: e.title,
+                    date: parseISO(e.startDate),
+                    endDate: parseISO(e.endDate || e.startDate),
+                    isAllDay: !!e.isAllDay,
+                    startTime: e.startTime?.slice(0, 5),
+                    endTime: e.endTime?.slice(0, 5),
+                    location: e.location,
+                    attendees: e.attendees || '',
+                    description: e.description,
+                    type: e.type || '내부'
+                }))
+            : []
 
 
         nextTick(() => {
@@ -275,7 +282,7 @@ function dayEvents(date) {
 
 
 function onDateClick(dayObj) {
-    if (!isLoggedIn.value || userRole.value !== 'ADMIN') return
+    if (!isLoggedIn.value) return
 
     const baseDate = format(dayObj.date, 'yyyy-MM-dd')
     formStartDate.value = baseDate
@@ -366,6 +373,7 @@ function onDeleteEvent() {
 }
 
 function openBlankForm() {
+    if (!isLoggedIn.value) return
     formTitle.value = ''
     formStartDate.value = format(new Date(), 'yyyy-MM-dd')
     formStartTime.value = '09:00'
@@ -426,37 +434,37 @@ function openBlankForm() {
     color: black;
 } */
 .calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 24px;
-  background-color: white;
-  border-bottom: 1px solid #eee;
-  color: black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background-color: white;
+    border-bottom: 1px solid #eee;
+    color: black;
 }
 
 .header-left {
-  font-size: 22px;
-  font-weight: bold;
-  color: black;
+    font-size: 22px;
+    font-weight: bold;
+    color: black;
 }
 
 .header-center {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
 }
 
 .header-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
 .login-btn {
-  font-size: 16px;
-  cursor: pointer;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 .top-add-button {
@@ -645,7 +653,7 @@ function openBlankForm() {
 }
 
 .all-day-checkbox {
-    
+
     display: flex;
     align-items: center;
     gap: 4px;
@@ -653,16 +661,19 @@ function openBlankForm() {
     font-size: 16px;
     justify-content: center;
 }
-.all-day-checkbox input{
+
+.all-day-checkbox input {
     margin-bottom: 0;
     width: auto;
 }
+
 .all-day-checkbox label {
     white-space: nowrap;
     font-weight: normal;
     margin: 0;
 }
-.event-label-span{
+
+.event-label-span {
     text-overflow: ellipsis;
     overflow: hidden;
 }
