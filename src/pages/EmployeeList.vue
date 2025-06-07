@@ -29,7 +29,7 @@
             <th class="p-2 border" @click="sortBy('employeeId')">직원 ID</th>
             <th class="p-2 border" @click="sortBy('employeeName')">이름</th>
             <th class="p-2 border" @click="sortBy('employeeDepartment')">부서</th>
-            <th class="p-2 border" @click="sortBy('employeePostion')">직책</th>
+            <th class="p-2 border" @click="sortBy('employeePosition')">직책</th>
             <th class="p-2 border" @click="sortBy('employeeEmail')">이메일</th>
             <th class="p-2 border" @click="sortBy('employeePhoneNumber')">전화번호</th>
             <th class="p-2 border" @click="sortBy('employeeDateOfJoin')">입사일</th>
@@ -75,12 +75,12 @@
             <td class="p-2 border">
               <template v-if="editingId === employee.employeeId">
                 <input
-                  v-model="editedEmployee.employeePostion"
+                  v-model="editedEmployee.employeePosition"
                   class="border px-1 py-1 w-full"
                 />
               </template>
               <template v-else>
-                {{ employee.employeePostion }}
+                {{ employee.employeePosition }}
               </template>
             </td>
 
