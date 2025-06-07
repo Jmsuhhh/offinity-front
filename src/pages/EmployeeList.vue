@@ -1,155 +1,131 @@
 <template>
-    <div class="flex min-h-screen font-sans">
-  
-      <!-- Main Content -->
-      <main class="flex-1 bg-gray-50 p-10">
-        <h2 class="text-xl font-semibold text-purple-800 mb-6 underline">전체 직원 명부</h2>
-        <nav>
-          <ul>
-            <li><a href="#" class="hover:underline">신규 직원 등록</a></li>
-          </ul>
-        </nav>
-  
-        <!-- Filters -->
-        <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
-          <input
-            v-model="filters.name"
-            placeholder="이름 검색"
-            class="border rounded-md px-3 py-2 text-sm w-52"
-          />
-          <input
-            v-model="filters.department"
-            placeholder="부서 검색"
-            class="border rounded-md px-3 py-2 text-sm w-52"
-          />
-          <input
-            v-model="filters.position"
-            placeholder="직책 검색"
-            class="border rounded-md px-3 py-2 text-sm w-52"
-          />
-        </div>
-  
-        <!-- Table -->
-        <table class="w-full text-sm text-left border">
-          <thead class="bg-purple-200 cursor-pointer">
-            <tr>
-              <th class="p-2 border" @click="sortBy('employee_id')">직원 ID</th>
-              <th class="p-2 border" @click="sortBy('name')">이름</th>
-              <th class="p-2 border" @click="sortBy('department')">부서</th>
-              <th class="p-2 border" @click="sortBy('position')">직책</th>
-              <th class="p-2 border" @click="sortBy('email')">이메일</th>
-              <th class="p-2 border" @click="sortBy('phone_number')">전화번호</th>
-              <th class="p-2 border" @click="sortBy('created_at')">등록일자</th>
-              <th class="p-2 border">관리</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="employee in paginatedEmployees" :key="employee.employee_id">
-              <td class="p-2 border">{{ employee.employee_id }}</td>
-              <td class="p-2 border">{{ employee.name }}</td>
-              <td class="p-2 border">{{ employee.department }}</td>
-              <td class="p-2 border">{{ employee.position }}</td>
-              <td class="p-2 border">{{ employee.email }}</td>
-              <td class="p-2 border">{{ employee.phone_number }}</td>
-              <td class="p-2 border">{{ employee.created_at }}</td>
-              <td class="p-2 border">
-                <button class="bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600">편집</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-  
-        <!-- Pagination -->
-        <div class="mt-4 flex justify-center space-x-2">
-          <button
-            class="px-3 py-1 border rounded"
-            :disabled="currentPage === 1"
-            @click="currentPage--"
-          >
-            이전
-          </button>
-          <span>페이지 {{ currentPage }} / {{ totalPages }}</span>
-          <button
-            class="px-3 py-1 border rounded"
-            :disabled="currentPage === totalPages"
-            @click="currentPage++"
-          >
-            다음
-          </button>
-        </div>
-      </main>
-    </div>
-  </template>
-  
-  <script setup>
-  import { ref, computed } from 'vue';
-  
-  const filters = ref({
-    name: '',
-    department: '',
-    position: '',
-  });
-  
-  const sortField = ref('employee_id');
-  const sortAsc = ref(true);
-  const currentPage = ref(1);
-  const itemsPerPage = 20;
-  
-  const employees = ref([
-    { employee_id: 1001, name: '홍길동', department: '인사팀', position: '대리', email: 'hong@co.com', phone_number: '010-1234-5678', created_at: '2025-04-01' },
-    { employee_id: 1002, name: '김미영', department: '개발팀', position: '팀장', email: 'kim@co.com', phone_number: '010-2345-6789', created_at: '2025-04-02' },
-    { employee_id: 1003, name: '박지성', department: '기획팀', position: '사원', email: 'park@co.com', phone_number: '010-4567-1234', created_at: '2025-04-03' },
-    { employee_id: 1004, name: '이수민', department: '개발팀', position: '과장', email: 'lee@co.com', phone_number: '010-5678-9012', created_at: '2025-04-04' },
-    { employee_id: 1005, name: '정은지', department: '인사팀', position: '차장', email: 'jung@co.com', phone_number: '010-6789-1234', created_at: '2025-04-05' },
-    { employee_id: 1005, name: '정은지', department: '인사팀', position: '차장', email: 'jung@co.com', phone_number: '010-6789-1234', created_at: '2025-04-05' },
-    { employee_id: 1005, name: '정은지', department: '인사팀', position: '차장', email: 'jung@co.com', phone_number: '010-6789-1234', created_at: '2025-04-05' },
-    { employee_id: 1005, name: '정은지', department: '인사팀', position: '차장', email: 'jung@co.com', phone_number: '010-6789-1234', created_at: '2025-04-05' },
+  <div class="flex min-h-screen font-sans">
+    <main class="flex-1 bg-gray-50 p-10">
+      <h2 class="text-xl font-semibold text-purple-800 mb-6 underline">전체 직원 명부</h2>
 
-   
-  ]);
-  
-  const filteredEmployees = computed(() => {
-    return employees.value
-      .filter((e) => e.name.includes(filters.value.name))
-      .filter((e) => e.department.includes(filters.value.department))
-      .filter((e) => e.position.includes(filters.value.position));
-  });
-  
-  const sortedEmployees = computed(() => {
-    return [...filteredEmployees.value].sort((a, b) => {
-      const field = sortField.value;
-      if (a[field] < b[field]) return sortAsc.value ? -1 : 1;
-      if (a[field] > b[field]) return sortAsc.value ? 1 : -1;
-      return 0;
+      <!-- Filters -->
+      <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
+        <input v-model="filters.name" placeholder="이름 검색" class="border rounded-md px-3 py-2 text-sm w-52" />
+        <input v-model="filters.department" placeholder="부서 검색" class="border rounded-md px-3 py-2 text-sm w-52" />
+        <input v-model="filters.position" placeholder="직책 검색" class="border rounded-md px-3 py-2 text-sm w-52" />
+      </div>
+
+      <!-- Employee Table -->
+      <table class="w-full text-sm text-left border">
+        <thead class="bg-purple-200 cursor-pointer">
+          <tr>
+            <!-- sortBy 로 정렬 필드를 변경 -->
+            <th class="p-2 border" @click="sortBy('employeeId')">직원 ID</th>
+            <th class="p-2 border" @click="sortBy('employeeName')">이름</th>
+            <th class="p-2 border" @click="sortBy('employeeDepartment')">부서</th>
+            <th class="p-2 border" @click="sortBy('employeePostion')">직책</th>
+            <th class="p-2 border" @click="sortBy('employeeEmail')">이메일</th>
+            <th class="p-2 border" @click="sortBy('employeePhoneNumber')">전화번호</th>
+            <th class="p-2 border" @click="sortBy('employeeDateOfJoin')">입사일</th>
+            <th class="p-2 border">관리</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="employee in employees" :key="employee.employeeId">
+            <td class="p-2 border">{{ employee.employeeId }}</td>
+            <td class="p-2 border">{{ employee.employeeName }}</td>
+            <td class="p-2 border">{{ employee.employeeDepartment }}</td>
+            <td class="p-2 border">{{ employee.employeePostion }}</td>
+            <td class="p-2 border">{{ employee.employeeEmail }}</td>
+            <td class="p-2 border">{{ employee.employeePhoneNumber }}</td>
+            <td class="p-2 border">{{ employee.employeeDateOfJoin }}</td>
+            <td class="p-2 border">
+              <button @click="startEdit(employee)" class="bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600">
+                편집
+              </button>
+            </td>
+          </tr>
+          <tr v-if="employees.length === 0">
+            <td class="p-2 border text-center" colspan="8">직원 데이터가 없습니다.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination Controls -->
+      <div class="mt-4 flex justify-center space-x-2 items-center">
+        <button @click="prevPage" :disabled="currentPage <= 1" class="px-3 py-1 border rounded disabled:opacity-50">이전</button>
+        <span>페이지 {{ currentPage }} / {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage >= totalPages" class="px-3 py-1 border rounded disabled:opacity-50">다음</button>
+      </div>
+    </main>
+  </div>
+</template>
+
+<script setup>
+import { ref, watchEffect, onMounted } from 'vue';
+import axios from 'axios';
+
+// Filters 상태
+const filters = ref({ name: '', department: '', position: '' });
+
+// Sorting 상태
+const sortField = ref('employeeId');
+const sortAsc = ref(true);
+
+// Pagination 상태
+const currentPage = ref(1);
+const itemsPerPage = 10;
+const totalPages = ref(1);
+
+// 직원 데이터 배열
+const employees = ref([]);
+
+// 직원 목록 로드 함수
+async function fetchEmployees() {
+  try {
+    const { data } = await axios.get('http://localhost:8001/api/employees', {
+      params: {
+        name: filters.value.name,
+        department: filters.value.department,
+        position: filters.value.position,
+        sortField: sortField.value,
+        sortDir: sortAsc.value ? 'asc' : 'desc',
+        page: currentPage.value,
+        size: itemsPerPage
+      }
     });
-  });
-  
-  const totalPages = computed(() =>
-    Math.ceil(sortedEmployees.value.length / itemsPerPage)
-  );
-  
-  const paginatedEmployees = computed(() => {
-    const start = (currentPage.value - 1) * itemsPerPage;
-    return sortedEmployees.value.slice(start, start + itemsPerPage);
-  });
-  
-  function sortBy(field) {
-    if (sortField.value === field) {
-      sortAsc.value = !sortAsc.value;
-    } else {
-      sortField.value = field;
-      sortAsc.value = true;
-    }
-    currentPage.value = 1;
+    employees.value = data.employees;
+    totalPages.value = data.totalPages;
+  } catch (error) {
+    console.error('직원 목록 로드 오류:', error);
   }
-  </script>
-  
-  <style scoped>
-  body {
-    font-family: 'Noto Sans KR', sans-serif;
+}
+
+// 컴포넌트 마운트 및 필터/페이지/정렬 변경 시 재호출
+onMounted(fetchEmployees);
+watchEffect(fetchEmployees);
+
+// 정렬 함수: 필드 토글
+function sortBy(field) {
+  if (sortField.value === field) {
+    sortAsc.value = !sortAsc.value;
+  } else {
+    sortField.value = field;
+    sortAsc.value = true;
   }
-  
-  
-  
-  </style>
-  
+  currentPage.value = 1;
+  fetchEmployees();
+}
+
+// 페이지 이동 함수
+function nextPage() {
+  if (currentPage.value < totalPages.value) currentPage.value++;
+}
+function prevPage() {
+  if (currentPage.value > 1) currentPage.value--;
+}
+
+// 편집 시작 더미
+function startEdit(employee) {
+  console.log('편집 시작:', employee);
+}
+</script>
+
+<style scoped>
+body { font-family: 'Noto Sans KR', sans-serif; }
+</style>
