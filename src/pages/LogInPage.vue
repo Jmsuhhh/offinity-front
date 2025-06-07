@@ -56,7 +56,10 @@ async function submitEvent() {
         console.log("로그인 성공");
 
         alert("로그인 성공");
-        router.replace('/');
+        // router.replace('/');
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectPath = urlParams.get('redirect') || '/';
+        router.replace(redirectPath);
 
     } catch(err) { // 요청 실패 시 실행 
         console.log(err)
