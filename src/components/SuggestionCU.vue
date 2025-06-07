@@ -1,31 +1,65 @@
 <template>
-  <div class="post-container">
-    <h2>게시글 {{isEdit ? '수정' : '등록'}}</h2>
+  <form @submit.prevent="onSubmit">
 
-    <label for="title">제목</label>
-    <input id="title" type="text" placeholder="제목을 입력하세요" />
+      <div class="post-container">
+        <h2>게시글 {{isEdit ? '수정' : '등록'}}</h2>
+        
+        <label for="title">제목</label>
+      <input id="title" v-model="title" type="text" placeholder="제목을 입력하세요" />
+      
+      <label for="content">내용</label>
+      <textarea id="content" v-model="content" rows="10" placeholder="내용을 입력하세요"></textarea>
 
-    <label for="content">내용</label>
-    <textarea id="content" rows="10" placeholder="내용을 입력하세요"></textarea>
+      <div class="radio-group">
+        <span>공개 여부</span>
+        <label><input v-model="visibility" type="radio" name="visibility" value="public" /> 공개</label>
+        <label><input v-model="visibility" type="radio" name="visibility" value="private" /> 비공개</label>
+      </div>
 
-    <div class="radio-group">
-      <span>공개 여부</span>
-      <label><input type="radio" name="visibility" value="public" checked /> 공개</label>
-      <label><input type="radio" name="visibility" value="private" /> 비공개</label>
+      <div class="button-group">
+        <button class="submit">{{isEdit ? '수정' : '작성'}}</button>
+        <button type="button" class="cancel">돌아가기</button>
+      </div>
     </div>
-
-    <div class="button-group">
-      <button class="submit">{{isEdit ? '수정' : '작성'}}</button>
-      <button class="cancel">돌아가기</button>
-    </div>
-  </div>
+  </form>
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import axios from 'axios';
+import { defineProps, ref } from 'vue';
+import { useRouter } from 'vue-router';
 defineProps({
   isEdit : {type:Boolean ,default : false}
 });
+
+const router = useRouter();
+
+const title = ref('');
+const content = ref('');
+const visibility = ref('public');
+
+function validateTitle(){
+  return true;
+}
+
+function validateContent(){
+  return true;
+}
+
+async function onSubmit(){
+  const isTitleValidate = validateTitle();
+  const isContentValidate = validateContent();
+  if(isTitleValidate && isContentValidate){
+    await axios.post('http://localhost:8001/api/suggestion', {
+      title : title.value,
+      content : content.value,
+      visible : visibility.value
+    });
+
+    router.replace('/board/suggestion');
+  }
+}
+
 </script>
 
 <style scoped>
