@@ -194,9 +194,6 @@
 import { ref, watch, onMounted } from 'vue'
 import axios from 'axios'
 
-axios.defaults.baseURL = 'http://localhost:8001'
-
-
 const filters = ref({ name: '', department: '', position: '' })
 
 
