@@ -3,22 +3,22 @@
 
       <div class="post-container">
         <h2>게시글 {{isEdit ? '수정' : '등록'}}</h2>
-        
+
         <label for="title">제목</label>
       <input id="title" v-model="title" type="text" placeholder="제목을 입력하세요" />
-      
+
       <label for="content">내용</label>
       <textarea id="content" v-model="content" rows="10" placeholder="내용을 입력하세요"></textarea>
 
       <div class="radio-group">
         <span>공개 여부</span>
-        <label><input v-model="visibility" type="radio" name="visibility" value="public" /> 공개</label>
-        <label><input v-model="visibility" type="radio" name="visibility" value="private" /> 비공개</label>
+        <label><input v-model="visibility" type="radio" name="visibility" value="공개" /> 공개</label>
+        <label><input v-model="visibility" type="radio" name="visibility" value="비공개" /> 비공개</label>
       </div>
 
       <div class="button-group">
         <button class="submit">{{isEdit ? '수정' : '작성'}}</button>
-        <button type="button" class="cancel">돌아가기</button>
+        <button type="button" class="cancel" @click="clickReturn">돌아가기</button>
       </div>
     </div>
   </form>
@@ -36,7 +36,7 @@ const router = useRouter();
 
 const title = ref('');
 const content = ref('');
-const visibility = ref('public');
+const visibility = ref('공개');
 
 function validateTitle(){
   return true;
@@ -58,6 +58,10 @@ async function onSubmit(){
 
     router.replace('/board/suggestion');
   }
+}
+
+function clickReturn(){
+  router.replace('/board/suggestion');
 }
 
 </script>
