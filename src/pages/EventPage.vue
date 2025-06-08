@@ -409,14 +409,16 @@ function openBlankForm() {
     box-sizing: border-box;
 
     padding: 0;
-    background-color: white;
+    /* background-color: white; */
+    background-color: black;
 }
 
 .calendar-container {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
     border-radius: 2px;
     padding: 2px;
-    background-color: white;
+    /* background-color: white; */
+    background-color: black;
     display: flex;
     flex-direction: column;
     margin: 0;
@@ -438,15 +440,18 @@ function openBlankForm() {
     justify-content: space-between;
     align-items: center;
     padding: 12px 24px;
-    background-color: white;
+    /* background-color: white; */
+    background-color: black;
     border-bottom: 1px solid #eee;
-    color: black;
+    /* color: black; */
+    color: white;
 }
 
 .header-left {
     font-size: 22px;
     font-weight: bold;
-    color: black;
+    /* color: black; */
+    color: white;
 }
 
 .header-center {
@@ -498,8 +503,10 @@ function openBlankForm() {
     text-align: center;
     font-weight: bold;
     padding: 4px 0;
-    background: #f0f0f0;
-    color: black;
+    /* background: #f0f0f0; */
+    /* color: black; */
+    background: #222;
+    color: white;
 }
 
 .day-cell {
@@ -512,6 +519,7 @@ function openBlankForm() {
 .date-number {
     font-size: 20px;
     color: #333;
+    color: #eee;
 }
 
 .date-number.sunday {
@@ -519,16 +527,18 @@ function openBlankForm() {
 }
 
 .day-cell.outside {
-    background-color: #f9f9f9;
+    /* background-color: #f9f9f9; */
+    background-color: #1a1a1a;
     color: #aaa;
 }
 
 .date-number.outsideText {
-    color: #ccc;
+    /* color: #ccc; */
+    color: #666;
 }
 
 .holiday {
-    background-color: #fff7f7;
+    background-color: #310f0f;
 }
 
 .holiday-label {
@@ -585,7 +595,8 @@ function openBlankForm() {
     font-size: 30px;
     cursor: pointer;
     padding: 4px 12px;
-    color: #333;
+    /* color: #333; */
+    color: #eee;
 }
 
 .nav-btn:hover {
@@ -607,7 +618,8 @@ function openBlankForm() {
 }
 
 .popup-box {
-    background: white;
+    /* background: white; */
+    background-color: black;
     color: #333;
     padding: 24px;
     border-radius: 8px;
@@ -619,6 +631,7 @@ function openBlankForm() {
     margin-top: 0;
     font-size: 20px;
     color: #222;
+    color: #fff;
 }
 
 .popup-box p {
@@ -630,8 +643,10 @@ function openBlankForm() {
 .popup-box button {
     margin-top: 10px;
     padding: 6px 12px;
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
+    /* background-color: #f9f9f9; */
+    background-color: #333;
+    color: white;
+    border: 1px solid #555;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
@@ -644,12 +659,48 @@ function openBlankForm() {
     padding: 6px;
     font-size: 14px;
     box-sizing: border-box;
+    background-color: #111;
+    color: #eee;
+    border: 1px solid #444;
 }
 
 .popup-box label {
     display: block;
     margin-top: 12px;
     text-align: left;
+    color: #eee;
+}
+
+.popup-box select {
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    background-color: #111;   
+    color: #eee;              
+    border: 1px solid #444;   
+    box-sizing: border-box;
+}
+
+.popup-box input[type="date"],
+.popup-box input[type="time"] {
+    background-color: #111;
+    color: #eee;
+    border: 1px solid #444;
+}
+
+.all-day-checkbox label {
+    color: #eee; 
+}
+
+.popup-box input::placeholder,
+.popup-box textarea::placeholder {
+    color: #888;  
+}
+
+input[type="date"],
+input[type="time"] {
+  color-scheme: dark; 
 }
 
 .all-day-checkbox {
