@@ -4,7 +4,7 @@
       <!-- Header with Title and Home Link -->
       <div class="header">
         <h2 class="title">전체 직원 명부</h2>
-        <router-link to="/" class="button-home">메인페이지</router-link>
+        <router-link to="/event" class="button-home">캘린더페이지</router-link>
       </div>
 
       <!-- Filters -->
